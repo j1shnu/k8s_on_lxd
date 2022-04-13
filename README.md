@@ -8,6 +8,6 @@ In this setup I'm using [containerd](https://github.com/containerd/containerd) a
 Usage: kubelxc [provision | destroy | start | stop]
 ```
 - `kubelxc provision` to provision the cluster. 
-> By default this will only provision Master node and a single Worker node. 
-> Edit `kubelxc` file and add worker nodes to this variable `NODES="kmaster kworker1"`.
+> By default this will only provision Master node and a single Worker node. \
+> Edit `kubelxc` file and add worker nodes to this variable `NODES="kmaster kworker1"`.\
 > The Master node name should be `kmaster`.
