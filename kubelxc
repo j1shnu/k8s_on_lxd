@@ -1,0 +1,70 @@
+#!/bin/bash
+
+NODES="kmaster kworker1"
+
+usage()
+{
+  echo "Usage: kubelxc [provision | destroy | start | stop]" && exit 1
+}
+
+provision()
+{
+  lxc profile show k8s &>/dev/null || (lxc profile create k8s && cat lxd-profile-for-k8s | lxc profile edit k8s)
+
+  for node in $NODES
+  do
+    echo "=> Launching $node <="
+    lxc launch ubuntu:20.04 $node -p k8s && sleep 10
+    echo "=> Provisioning K8s in $node <="
+    cat bootstrap-k8s.sh | lxc exec $node bash
+  done
+}
+
+destroy()
+{
+  for node in $NODES
+  do 
+    echo "=> Destroying $node <="
+    lxc delete --force $node &>/dev/null || echo "$node Not Found"
+  done
+}
+
+start()
+{
+  for node in $NODES
+  do 
+    echo "=> Starting $node <="
+    lxc start $node &>/dev/null || echo "$node Already running Or Not Found"
+  done
+}
+
+stop()
+{
+  for node in $NODES
+  do 
+    echo "=> Stopping $node <="
+    lxc stop $node &>/dev/null || echo "$node Not Found"
+  done
+}
+
+case "$1" in 
+  provision)
+    echo -e "\nProvisioning Kubernetes Cluster...\n"
+    provision
+    ;;
+  destroy)
+    echo -e "\nDestroying Kubernetes Cluster...\n"
+    destroy
+    ;;
+  start)
+    echo -e "\nStarting Stopped Cluster...\n"
+    start
+    ;;
+  stop)
+    echo -e "\nStopping Running Cluster...\n"
+    stop
+    ;;
+  *)
+    usage
+    ;;
+esac

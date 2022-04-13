@@ -11,9 +11,7 @@ systemctl enable containerd >/dev/null 2>&1
 # Add yum repo file for Kubernetes
 echo "[TASK 2] Add apt repo file for kubernetes"
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add - >/dev/null 2>&1
-cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
-deb https://apt.kubernetes.io/ kubernetes-xenial main
-EOF
+apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main" >/dev/null 2>&1
 
 # Install Kubernetes
 echo "[TASK 3] Install Kubernetes (kubeadm, kubelet and kubectl)"
@@ -95,7 +93,7 @@ fi
 
 # To Fix disk pressure taint issue
 echo "[Final Task] Fixing Disk Pressure Taint Issue"
-tee -a /var/lib/kubelet/config.yaml <<EOF
+cat <<EOF >> /var/lib/kubelet/config.yaml
 eviction-hard:
   memory.available<100Mi
   nodefs.available<1%
